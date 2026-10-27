@@ -799,23 +799,43 @@ Clients will throw errors if:
 * The request configuration is missing
 * A payment has already been attempted for the request
 * There is an error creating the payment header
+* A server returns an unexpectedly large 402 response body (Python only)
 
 Common error handling:
 
-```typescript
-try {
-  const response = await fetchWithPayment(url, { method: "GET" });
-  // Handle success
-} catch (error) {
-  if (error.message.includes("No scheme registered")) {
-    console.error("Network not supported - register the appropriate scheme");
-  } else if (error.message.includes("Payment already attempted")) {
-    console.error("Payment failed on retry");
-  } else {
-    console.error("Request failed:", error);
-  }
-}
-```
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    try {
+      const response = await fetchWithPayment(url, { method: "GET" });
+      // Handle success
+    } catch (error) {
+      if (error.message.includes("No scheme registered")) {
+        console.error("Network not supported - register the appropriate scheme");
+      } else if (error.message.includes("Payment already attempted")) {
+        console.error("Payment failed on retry");
+      } else {
+        console.error("Request failed:", error);
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    from x402.http.utils import ResponseBodyTooLargeError
+
+    try:
+        response = await http.get("https://api.example.com/paid-endpoint")
+        # Handle success
+    except ResponseBodyTooLargeError:
+        # The server returned an oversized 402 response body (limit: 1 MiB).
+        # This typically indicates a misconfigured or malicious server.
+        print("Server returned an unexpectedly large payment-required response")
+    except Exception as e:
+        print(f"Request failed: {e}")
+    ```
+  </Tab>
+</Tabs>
 
 ### Summary
 
