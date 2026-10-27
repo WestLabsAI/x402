@@ -375,6 +375,10 @@ For custom facilitator implementations, use `UptoSvmScheme` from the facilitator
         // },
         // Optional: shared store for multi-replica facilitators. Default is in-memory.
         // DelegatedAuthStore: sharedRedisDelegatedAuthStore,
+        // Optional: message version (0 or 1) for facilitator-built transactions
+        // (claim, cancel, rent-cleanup). Does not affect client-built transactions.
+        // Defaults to 1. Panics on any other value.
+        // FacilitatorTransactionVersion: &[]int{0}[0],
     })
     facilitator.Register([]x402.Network{network}, scheme)
 
