@@ -592,6 +592,8 @@ When `EnableSmartWalletVerification` is enabled, transactions that fail static v
 **TypeScript**: `toFacilitatorSvmSigner()` is required when enabling smart wallet verification — it provides the `simulateTransactionWithInnerInstructions`, `getConfirmedTransactionInnerInstructions`, `getTokenAccountBalance`, and `fetchAddressLookupTables` methods needed for simulation-based verification.
 
 **Go**: Your signer must implement `SmartWalletRPCCapabilities` (i.e. `SimulateTransactionWithInnerInstructions`, `GetConfirmedTransactionInnerInstructions`, `GetTokenAccountBalance`, and `FetchAddressLookupTables`) — `NewExactSvmScheme` panics at startup if `EnableSmartWalletVerification` is true and the signer does not satisfy this interface.
+
+**Python**: The built-in `FacilitatorKeypairSigner` automatically provides enhanced ATA diagnostics after a failed simulation. If you implement a custom signer, you can opt in to the same diagnostics by also implementing the `FacilitatorSvmSignerWithGetAccountInfo` protocol — add a `get_account_info(address: str, network: str) -> str | None` method that returns the account owner at confirmed commitment (or `None` when the account does not exist). When this method is present, a simulation failure caused by a missing or wrong-program recipient token account returns `invalid_exact_svm_recipient_ata_missing` or `invalid_exact_svm_recipient_ata_wrong_program_owner` instead of the generic `transaction_simulation_failed`.
 </Note>
 
 Additional options:
